@@ -9,6 +9,7 @@ RUN apt-get install nodejs -y
 RUN apt-get install npm -y
 RUN npm config set registry="http://registry.npmjs.org/"
 RUN apt-get install wget -y
+RUN npm install request
 RUN npm install express
 RUN npm install yargs@next
 RUN npm install systeminformation

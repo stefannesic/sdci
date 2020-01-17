@@ -2,16 +2,26 @@ const request = require('request');
 
 const args = process.argv.splice(2);
 
-function getLatency(url, win) {
+async function getLatency(url, win) {
 	let res = 0;
 	for(i = 0; i < win; i++) {
+		const before = Date.now();
 		request(url, time = true, function(err, response) {
-			console.log("Request time : ", response.elapsedTime);
-			res += response.elapsedTime;
+			after = JSON.parse(response.body)["pong"];
+			res += after - before
+			console.log(i)
+			if(i === (win-1)) {
+				console.log(res);
+				return res / win;
+			}
 		})
 	}
+	return res / win;
 }
 
-console.log("Mean response time : ", getLatency(args[0], args[1]));
+async function main() {
+	let res = await getLatency(args[0], args[1]);
+	console.log(res);
+}
 
-
+main()
