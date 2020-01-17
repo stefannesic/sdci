@@ -9,10 +9,8 @@ RUN apt-get update \
         && npm install express \
         && npm install request \
         && npm install yargs \
-        && npm install systeminformation \
-        && wget http://homepages.laas.fr/smedjiah/tmp/gateway.js
+        && wget http://homepages.laas.fr/smedjiah/tmp/device.js
 
-ENTRYPOINT node gateway.js --local_ip "172.17.0.4" --local_port 8282 --local_name "gwf1" --remote_ip "172.17.0.3" --remote_port 8181 --remote_name "gwi" ; tail -f /dev/null
-
+ENTRYPOINT node device.js --local_ip "172.17.0.5" --local_port 9001 --local_name "dev1" --remote_ip "172.17.0.4" --remote_port 8282 --remote_name "gwf1" --send_period 3000 ; tail -f /dev/null
 
 
