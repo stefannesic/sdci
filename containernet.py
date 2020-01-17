@@ -7,11 +7,43 @@ from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.link import TCLink
 from mininet.log import info, setLogLevel
+from emuvim.dcemulator.net import DCNetwork
+from emuvim.api.rest.rest_api_endpoint import RestApiEndpoint
+from emuvim.api.openstack.openstack_api_endpoint import OpenstackApiEndpoint
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.base').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.compute').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.keystone').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.nova').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.neutron').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.heat').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.heat.parser').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.glance').setLevel(logging.DEBUG)
+logging.getLogger('api.openstack.helper').setLevel(logging.DEBUG)
+
 setLogLevel('info')
 
-net = Containernet(controller=Controller)
+#net = Containernet(controller=Controller)
+net = DCNetwork(monitor=False, enable_learning=True)
+
+
+dc1 = net.addDatacenter("dc1")
+# add OpenStack-like APIs to the emulated DC
+api1 = OpenstackApiEndpoint("0.0.0.0", 6001)
+api1.connect_datacenter(dc1)
+api1.start()
+api1.connect_dc_network(net)
+# add the command line interface endpoint to the emulated DC (REST API)
+rapi1 = RestApiEndpoint("0.0.0.0", 5001)
+rapi1.connectDCNetwork(net)
+rapi1.connectDatacenter(dc1)
+rapi1.start()
+	
 info('*** Adding controller\n')
-net.addController('c0')
+#net.addController('c0')
 
 info('*** Adding docker containers\n')
 srv = net.addDocker('srv', ip='10.0.0.30', dimage="server:latest")
@@ -33,6 +65,7 @@ s5 = net.addSwitch('s5')
 info('*** Creating links\n')
 net.addLink(srv, s1)
 net.addLink(gwi, s1)
+net.addLink(dc1, s1)
 net.addLink(gwf1, s3)
 net.addLink(dev1, s3)
 net.addLink(gwf2, s4)
