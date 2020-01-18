@@ -10,8 +10,13 @@ RUN apt-get install npm -y
 RUN npm config set registry="http://registry.npmjs.org/"
 RUN apt-get install wget -y
 RUN npm install express
+RUN npm install request
 RUN npm install yargs@next
 RUN npm install systeminformation
+RUN npm cache clean -f
+RUN npm install -g n
+RUN n stable
+RUN alias node='/usr/local/n/versions/node/12.14.1/bin/node'
 RUN wget http://homepages.laas.fr/smedjiah/tmp/device.js
 
 ENTRYPOINT node device.js --local_ip "172.17.0.5" --local_port 9001 --local_name "dev1" --remote_ip "172.17.0.4" --remote_port 8282 --remote_name "gwf1" --send_period 3000 ; tail -f /dev/null
